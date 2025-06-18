@@ -28,3 +28,6 @@ htmlcov/
 # IDE / editor settings
 .idea/
 .vscode/
+
+# Ignore generated report outputs
+src/output/
