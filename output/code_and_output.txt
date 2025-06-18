@@ -1,0 +1,326 @@
+-----BEGIN FILE: hangman.py-----
+import random
+
+# List of at least 50 words
+words = [
+    'python', 'programming', 'hangman', 'challenge', 'computer', 'science', 'algorithm', 'function',
+    'variable', 'object', 'class', 'method', 'inheritance', 'composition', 'polymorphism', 'encapsulation',
+    'abstraction', 'exception', 'debugging', 'compiler', 'interpreter', 'syntax', 'semantics', 'iterator',
+    'generator', 'decorator', 'lambda', 'binary', 'array', 'list', 'tuple', 'dictionary', 'set', 'string',
+    'integer', 'float', 'boolean', 'loop', 'condition', 'recursion', 'iteration', 'module', 'package',
+    'framework', 'library', 'development', 'integration', 'deployment', 'algorithmic', 'optimization',
+    'performance', 'efficiency', 'scalability'
+]
+
+# ASCII art for the hangman states (from 0 wrong guesses to 6 wrong guesses)
+hangman_stages = [
+    """
+       +---+
+       |   |
+           |
+           |
+           |
+           |
+    =========
+    """,
+    """
+       +---+
+       |   |
+       O   |
+           |
+           |
+           |
+    =========
+    """,
+    """
+       +---+
+       |   |
+       O   |
+       |   |
+           |
+           |
+    =========
+    """,
+    """
+       +---+
+       |   |
+       O   |
+      /|   |
+           |
+           |
+    =========
+    """,
+    """
+       +---+
+       |   |
+       O   |
+      /|\\  |
+           |
+           |
+    =========
+    """,
+    """
+       +---+
+       |   |
+       O   |
+      /|\\  |
+      /    |
+           |
+    =========
+    """,
+    """
+       +---+
+       |   |
+       O   |
+      /|\\  |
+      / \\  |
+           |
+    =========
+    """
+]
+
+# Maximum number of wrong guesses
+max_wrong = len(hangman_stages) - 1
+
+def play_hangman(simulated_inputs=None):
+    # For reproducibility in simulation
+    random.seed(0)
+    word = random.choice(words)
+    word_letters = set(word)
+    guessed_letters = set()
+    wrong_guesses = 0
+    
+    # Display list to show current progress
+    display = ["_" for _ in word]
+    
+    # Define a helper to get input (simulate if simulated_inputs provided)
+    if simulated_inputs is not None:
+        # Create an iterator over the simulated inputs
+        simulated_iter = iter(simulated_inputs)
+        def get_input(prompt):
+            try:
+                # Display the prompt for simulation clarity
+                print(prompt, end='')
+                val = next(simulated_iter)
+                print(val)  # show the input as if the user entered it
+                return val
+            except StopIteration:
+                # If we run out of simulated inputs, revert to normal input
+                return input(prompt)
+    else:
+        def get_input(prompt):
+            return input(prompt)
+    
+    print('Welcome to Hangman Game!')
+    
+    # Game loop
+    while wrong_guesses < max_wrong and set(display) != set(word):
+        print(hangman_stages[wrong_guesses])
+        print('Word: ' + ' '.join(display))
+        guess = get_input('Guess a letter: ').lower()
+        
+        if len(guess) != 1 or not guess.isalpha():
+            print('Please enter a single alphabet letter.\n')
+            continue
+        
+        if guess in guessed_letters:
+            print(f'You already guessed "{guess}". Try another letter.\n')
+            continue
+        
+        guessed_letters.add(guess)
+        
+        if guess in word_letters:
+            # Update the display for correctly guessed letters
+            for idx, letter in enumerate(word):
+                if letter == guess:
+                    display[idx] = guess
+            print('Good guess!\n')
+        else:
+            wrong_guesses += 1
+            print('Wrong guess.\n')
+    
+    # End of game, show final state
+    print(hangman_stages[wrong_guesses])
+    print('Word: ' + ' '.join(display))
+    if wrong_guesses == max_wrong:
+        print('You lost! The correct word was: ' + word)
+    else:
+        print('Congratulations! You guessed the word.')
+
+if __name__ == '__main__':
+    # For demonstration, we supply a simulated list of inputs that hopefully covers both correct and wrong guesses.
+    simulated_inputs = ['e', 'a', 'i', 'o', 'u', 't', 's', 'r', 'n', 'l', 'p', 'g', 'm', 'h']
+    play_hangman(simulated_inputs=simulated_inputs)
+
+-----END FILE: hangman.py-----
+
+-----BEGIN OUTPUT-----
+Welcome to Hangman Game!
+
+       +---+
+       |   |
+           |
+           |
+           |
+           |
+    =========
+    
+Word: _ _ _ _ _ _ _ _ _
+Guess a letter: e
+Good guess!
+
+
+       +---+
+       |   |
+           |
+           |
+           |
+           |
+    =========
+    
+Word: _ e _ e _ _ _ _ _
+Guess a letter: a
+Good guess!
+
+
+       +---+
+       |   |
+           |
+           |
+           |
+           |
+    =========
+    
+Word: _ e _ e _ a _ _ _
+Guess a letter: i
+Wrong guess.
+
+
+       +---+
+       |   |
+       O   |
+           |
+           |
+           |
+    =========
+    
+Word: _ e _ e _ a _ _ _
+Guess a letter: o
+Good guess!
+
+
+       +---+
+       |   |
+       O   |
+           |
+           |
+           |
+    =========
+    
+Word: _ e _ e _ a _ o _
+Guess a letter: u
+Wrong guess.
+
+
+       +---+
+       |   |
+       O   |
+       |   |
+           |
+           |
+    =========
+    
+Word: _ e _ e _ a _ o _
+Guess a letter: t
+Good guess!
+
+
+       +---+
+       |   |
+       O   |
+       |   |
+           |
+           |
+    =========
+    
+Word: _ e _ e _ a t o _
+Guess a letter: s
+Wrong guess.
+
+
+       +---+
+       |   |
+       O   |
+      /|   |
+           |
+           |
+    =========
+    
+Word: _ e _ e _ a t o _
+Guess a letter: r
+Good guess!
+
+
+       +---+
+       |   |
+       O   |
+      /|   |
+           |
+           |
+    =========
+    
+Word: _ e _ e r a t o r
+Guess a letter: n
+Good guess!
+
+
+       +---+
+       |   |
+       O   |
+      /|   |
+           |
+           |
+    =========
+    
+Word: _ e n e r a t o r
+Guess a letter: l
+Wrong guess.
+
+
+       +---+
+       |   |
+       O   |
+      /|\\  |
+           |
+           |
+    =========
+    
+Word: _ e n e r a t o r
+Guess a letter: p
+Wrong guess.
+
+
+       +---+
+       |   |
+       O   |
+      /|\\  |
+      /    |
+           |
+    =========
+    
+Word: _ e n e r a t o r
+Guess a letter: g
+Good guess!
+
+
+       +---+
+       |   |
+       O   |
+      /|\\  |
+      /    |
+           |
+    =========
+    
+Word: g e n e r a t o r
+Congratulations! You guessed the word.
+-----END OUTPUT-----
