@@ -1,14 +1,30 @@
 #!/usr/bin/env python
 import warnings
-from datetime import datetime
-from code_monkeys.crew import CodeMonkeys
+import os
+from code_monkeys.crew import EngineeringTeam
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
+os.makedirs('output', exist_ok=True)
+
+requirements = """Create the game tic tac toe. The game should allow 1 user to play against the 'machine', OR two players to play eachother"""
+module_name = "TicTacToe"
+class_name = "T3Game"
+
+
 def run():
-    """Run the CodeMonkeys crew"""
-    inputs = {'assignment': """Write a python version of the hangman game. There should be at least 50 words. 
-              When game starts, randomly select one of the words. Use ascii art to 'draw' the hanging man, 
-              and update the drawing each wrong guess"""}
-    result = CodeMonkeys().crew().kickoff(inputs=inputs)
-    print(result.raw)
+    """
+    Run the research crew.
+    """
+    inputs = {
+        'requirements': requirements,
+        'module_name': module_name,
+        'class_name': class_name
+    }
+
+    # Create and run the crew
+    result = EngineeringTeam().crew().kickoff(inputs=inputs)
+
+
+if __name__ == "__main__":
+    run()
