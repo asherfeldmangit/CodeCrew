@@ -55,15 +55,21 @@ class EngineeringFlow(Flow[EngineeringState]):
     # ---------------------------------------------------------------------
 
     @start()
-    def collect_inputs(self, requirements: str, project_name: str, class_name: str):  # noqa: D401
+    def collect_inputs(
+        self,
+        requirements: str,
+        project_name: str | None = None,
+        class_name: str | None = None,
+    ):  # noqa: D401
         """Populate initial state from kickoff() arguments."""
 
         self.state.requirements = requirements
-        self.state.project_name = project_name
-        self.state.class_name = class_name
+        self.state.project_name = project_name or ""
+        self.state.class_name = class_name or ""
 
-        # Ensure a dedicated output directory for the project exists
-        os.makedirs(f"output/{project_name}", exist_ok=True)
+        # If name already provided create output dir now; otherwise propose_names step will do it.
+        if self.state.project_name:
+            os.makedirs(f"output/{self.state.project_name}", exist_ok=True)
         return "inputs_collected"
 
     # ---------------------------------------------------------------------
