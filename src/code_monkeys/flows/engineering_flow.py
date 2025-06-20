@@ -91,21 +91,27 @@ class EngineeringFlow(Flow[EngineeringState]):
         prompt = (
             "You are a senior software architect. Given the product requirements "
             "below, propose a concise Python *package* name (PascalCase, no spaces) "
-            "and a main *class* name (also PascalCase). Reply strictly in JSON with "
-            "keys 'project_name' and 'class_name'.\n\n"
+            "and a main *class* name (also PascalCase).\n\n"
+            "IMPORTANT: Reply ONLY with valid JSON and nothing else. "
+            "The JSON must be: {\"project_name\": \"...\", \"class_name\": \"...\"}\n\n"
             f"Requirements:\n{self.state.requirements}\n"
         )
 
         # We attempt to call the agent; if any exception occurs, we have a fallback.
         try:
             response = architect.chat(prompt)  # type: ignore[attr-defined]
-            data = json.loads(response)
+            # Extract the first JSON object from the response (robust to extra text)
+            json_match = re.search(r"\{.*?\}", response, flags=re.DOTALL)
+            if not json_match:
+                raise ValueError("No JSON object found in agent reply")
+            data = json.loads(json_match.group())
             raw_project = str(data["project_name"]).strip()
             raw_class = str(data["class_name"]).strip()
         except Exception:  # pragma: no cover – robust fallback
             # Fallback: derive names from requirements heuristic.
-            slug = re.sub(r"[^A-Za-z]+", " ", self.state.requirements).title().replace(" ", "")
-            raw_project = slug if slug else "GeneratedProject"
+            words = re.findall(r"[A-Za-z0-9]+", self.state.requirements)[:3]
+            slug = "".join(w.title() for w in words)
+            raw_project = slug or "GeneratedProject"
             raw_class = raw_project
 
         # -----------------------------------------------------------------
