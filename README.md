@@ -50,7 +50,7 @@ cp .env.example .env && echo "OPENAI_API_KEY=sk-..." >> .env
 crewai run
 ```
 
-The crew will ask for *project name* & *main class* (requirements are now read from `project_requirements.txt`) then:
+The architect agent auto-generates a *project name* & *main class* for you, then:
 1. Generate a **design doc**.  
 2. Break it down into **atomic tasks**.  
 3. Implement backend → review → fix → **unit tests**.  

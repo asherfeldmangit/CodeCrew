@@ -9,6 +9,8 @@ be extended with richer control-flow (iterations, branching, etc.).
 
 from typing import Dict, Any
 import os
+import json
+import re
 
 from pydantic import BaseModel, Field
 from crewai.flow.flow import Flow, listen, start
@@ -65,10 +67,55 @@ class EngineeringFlow(Flow[EngineeringState]):
         return "inputs_collected"
 
     # ---------------------------------------------------------------------
-    # 2) Run the existing EngineeringTeam crew
+    # 1b) Ask architect to propose project & main class names
     # ---------------------------------------------------------------------
 
     @listen(collect_inputs)
+    def propose_names(self, _prev: Any):  # noqa: D401
+        """Use the architect_agent to suggest *project_name* and *class_name*.
+
+        The agent is prompted to reply with a JSON document containing
+        {"project_name": "...", "class_name": "..."}. We fall back to a
+        deterministic slug if parsing fails.
+        """
+
+        if self.state.project_name and self.state.class_name:
+            # Names were provided explicitly in kickoff; skip generation.
+            return "names_preexisting"
+
+        # Instantiate a standalone architect_agent (no crew yet)
+        architect = EngineeringTeam().architect_agent()
+
+        prompt = (
+            "You are a senior software architect. Given the product requirements "
+            "below, propose a concise Python *package* name (PascalCase, no spaces) "
+            "and a main *class* name (also PascalCase). Reply strictly in JSON with "
+            "keys 'project_name' and 'class_name'.\n\n"
+            f"Requirements:\n{self.state.requirements}\n"
+        )
+
+        # We attempt to call the agent; if any exception occurs, we have a fallback.
+        try:
+            response = architect.chat(prompt)  # type: ignore[attr-defined]
+            data = json.loads(response)
+            self.state.project_name = str(data["project_name"]).strip()
+            self.state.class_name = str(data["class_name"]).strip()
+        except Exception:  # pragma: no cover – robust fallback
+            # Fallback: derive names from requirements heuristic.
+            slug = re.sub(r"[^A-Za-z]+", " ", self.state.requirements).title().replace(" ", "")
+            self.state.project_name = slug if slug else "GeneratedProject"
+            self.state.class_name = self.state.project_name
+
+        # Ensure an output directory now that we have the project name
+        os.makedirs(f"output/{self.state.project_name}", exist_ok=True)
+
+        return "names_proposed"
+
+    # ---------------------------------------------------------------------
+    # 2) Run the existing EngineeringTeam crew
+    # ---------------------------------------------------------------------
+
+    @listen(propose_names)
     def run_engineering_crew(self, _previous_step_output: Any):  # noqa: D401
         """Kick off the existing EngineeringTeam hierarchical crew."""
 
@@ -76,6 +123,7 @@ class EngineeringFlow(Flow[EngineeringState]):
             "requirements": self.state.requirements,
             "project_name": self.state.project_name,
             "class_name": self.state.class_name,
+            "project_name_lower": self.state.project_name.lower(),
         }
 
         # The crew returns a Result object with a `.raw` attribute (by default)

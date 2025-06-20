@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 import warnings
-import os
-from code_monkeys.crew import EngineeringTeam
 import subprocess
 import sys
 import ensurepip
+from code_monkeys.flows.engineering_flow import kickoff as flow_kickoff
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
@@ -19,9 +18,6 @@ except FileNotFoundError as exc:
     raise FileNotFoundError(
         "project_requirements.txt not found. Please create the file with your product description."
     ) from exc
-
-project_name = "Dating_Website"
-class_name = "DatingWebsite"
 
 
 def _bootstrap_pip() -> None:
@@ -61,19 +57,14 @@ def run():
     # Bootstrap packaging tools first (suggestion 5)
     _bootstrap_pip()
 
-    # Ensure the per-project output directory exists (after project_name is set)
-    os.makedirs(f"output/{project_name}", exist_ok=True)
-
+    # Inputs now require only the requirements; naming is handled by the architect.
     inputs = {
         'requirements': requirements,
-        'project_name': project_name,
-        'class_name': class_name,
-        'project_name_lower': project_name.lower(),
     }
 
-    # Create and run the crew
-    result = EngineeringTeam().crew().kickoff(inputs=inputs)
-    
+    # Run the high-level flow (handles naming + crew orchestration)
+    flow_kickoff(**inputs)
+
 
 if __name__ == "__main__":
     run()
