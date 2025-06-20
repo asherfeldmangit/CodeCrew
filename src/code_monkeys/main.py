@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import warnings
+import os
 import subprocess
 import sys
 import ensurepip
