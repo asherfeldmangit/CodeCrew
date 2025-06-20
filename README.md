@@ -37,17 +37,20 @@
 # 1️⃣ Install uv (the ultra-fast Python package manager)
 pip install uv
 
-# 2️⃣ Install dependencies & lock versions
+# 2️⃣ Describe your product requirements (one-liner)
+echo "Create a demo dating website for 'little' people. Brand it and be creative with the design" > project_requirements.txt
+
+# 3️⃣ Install dependencies & lock versions
 crewai install            # installs from pyproject + uv.lock
 
-# 3️⃣ Add your OpenAI key
+# 4️⃣ Add your OpenAI key
 cp .env.example .env && echo "OPENAI_API_KEY=sk-..." >> .env
 
-# 4️⃣ Spin up your AI engineering team 🐒
+# 5️⃣ Spin up your AI engineering team 🐒
 crewai run
 ```
 
-The crew will ask for *requirements*, *project name* & *main class* then:
+The crew will ask for *project name* & *main class* (requirements are now read from `project_requirements.txt`) then:
 1. Generate a **design doc**.  
 2. Break it down into **atomic tasks**.  
 3. Implement backend → review → fix → **unit tests**.  

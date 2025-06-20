@@ -10,7 +10,15 @@ warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
 os.environ.setdefault("CHROMA_TELEMETRY_ENABLED", "false")
 
-requirements = """Create a demo dating website for 'little' people. Brand it and be creative with the design"""
+# Load product requirements from a dedicated text file so that they can be
+# edited without touching the Python code. The file lives at project root.
+try:
+    with open("project_requirements.txt", "r", encoding="utf-8") as _req_file:
+        requirements = _req_file.read().strip()
+except FileNotFoundError as exc:
+    raise FileNotFoundError(
+        "project_requirements.txt not found. Please create the file with your product description."
+    ) from exc
 
 project_name = "Dating_Website"
 class_name = "DatingWebsite"
