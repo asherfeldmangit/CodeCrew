@@ -153,7 +153,7 @@ def kickoff(**inputs):
 
     flow = EngineeringFlow()
     # Pass inputs to the Flow; these propagate to the collect_inputs step.
-    flow_output = flow.kickoff(inputs=inputs)
+    flow_output = flow.kickoff(inputs)
     return flow_output
 
 
