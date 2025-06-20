@@ -37,8 +37,9 @@
 # 1️⃣ Install uv (the ultra-fast Python package manager)
 pip install uv
 
-# 2️⃣ Describe your product requirements (one-liner)
-echo "Create a demo dating website for 'little' people. Brand it and be creative with the design" > project_requirements.txt
+# 2️⃣ Add *your own* product requirements
+#    (open `project_requirements.txt` in your editor and describe what you want built)
+echo "My awesome idea goes here…" > project_requirements.txt
 
 # 3️⃣ Install dependencies & lock versions
 crewai install            # installs from pyproject + uv.lock
