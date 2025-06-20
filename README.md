@@ -1,43 +1,135 @@
 # CodeMonkeys Crew
 
-Welcome to the CodeMonkeys Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.10%20%E2%80%93%203.13-blue?logo=python" />
+  <img src="https://img.shields.io/github/license/asherfeldmangit/CodeCrew" />
+  <img src="https://img.shields.io/github/actions/workflow/status/asherfeldmangit/CodeCrew/ci.yml?label=CI" />
+</p>
 
-## Installation
+> **Multi-agent software engineering on autopilot** — powered by [crewAI](https://crewai.com) & OpenAI.
 
-Ensure you have Python >=3.10 <3.14 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
+---
 
-First, if you haven't already, install uv:
+## ✨ Highlights
+
+• **Hierarchical multi-agent crew** (backend, frontend, QA, architect & engineering lead).  
+• **Event-driven _Flow_ orchestration** with per-task feedback loops (design → code → review → fixes → QA).  
+• **Long-, short- & entity-memory** via vector DB (Chroma) and SQLite LTM.  
+• **Zero-config developer experience** — `crewai run` boots a full AI team that ships production-ready code.  
+• **Utility DevOps agent** materialises monolithic artefacts into real source files on disk.
+
+---
+
+## 📖 Table of Contents
+1. [Quick Start](#-quick-start)  
+2. [Workflow Deep-Dive](#-workflow-deep-dive)  
+3. [Project Structure](#-project-structure)  
+4. [Architecture Diagram](#-architecture-diagram)  
+5. [Configuration](#-configuration)  
+6. [Contributing](#-contributing)  
+7. [License](#-license)
+
+---
+
+## 🚀 Quick Start
 
 ```bash
+# 1️⃣ Install uv (the ultra-fast Python package manager)
 pip install uv
+
+# 2️⃣ Install dependencies & lock versions
+crewai install            # installs from pyproject + uv.lock
+
+# 3️⃣ Add your OpenAI key
+cp .env.example .env && echo "OPENAI_API_KEY=sk-..." >> .env
+
+# 4️⃣ Spin up your AI engineering team 🐒
+crewai run
 ```
 
-Next, navigate to your project directory and install the dependencies:
+The crew will ask for *requirements*, *project name* & *main class* then:
+1. Generate a **design doc**.  
+2. Break it down into **atomic tasks**.  
+3. Implement backend → review → fix → **unit tests**.  
+4. Implement frontend → review → fix → **E2E tests**.  
+5. Perform **dependency audit** & materialise artefacts.
 
-(Optional) Lock the dependencies and install them by using the CLI command:
-```bash
-crewai install
+Open the generated code under `output/<PROJECT>/` — ready to run!
+
+---
+
+## 🔍 Workflow Deep-Dive
+
+Below is the default pipeline executed by `EngineeringFlow`.
+Steps with the same background colour run in sequence, arrows denote dependencies.
+
+```mermaid
+graph TD
+    subgraph Design
+        A["Design 📄\narchitect_agent"]
+        B["Task Breakdown 🗂\ntask_breaker"]
+    end
+    subgraph Backend
+        C["Backend Code 💾\nbackend_engineer"]
+        D["Code Review 🔍\narchitect_agent"]
+        E["Fix Comments 🛠\nbackend_engineer"]
+        F["Unit Tests ✅\ntest_engineer"]
+    end
+    subgraph Frontend
+        G["Frontend UI 💻\nfrontend_engineer"]
+        H["UI Review 🔍\narchitect_agent"]
+        I["Fix Comments 🛠\nfrontend_engineer"]
+        J["Dependency Audit 📦\narchitect_agent"]
+    end
+    subgraph QA
+        K["End-to-End Tests 🚦\ntest_engineer"]
+    end
+    A --> B --> C --> D --> E --> F
+    F --> G --> H --> I --> J --> K
 ```
-### Customizing
 
-**Add your `OPENAI_API_KEY` into the `.env` file**
+Each **code→review→fix** trio can iterate up to *three* rounds if blockers remain.
 
-- Modify `src/code_monkeys/config/agents.yaml` to define your agents
-- Modify `src/code_monkeys/config/tasks.yaml` to define your tasks
-- Modify `src/code_monkeys/crew.py` to add your own logic, tools and specific args
-- Modify `src/code_monkeys/main.py` to add custom inputs for your agents and tasks
+---
 
-## Running the Project
+## 🗂 Project Structure
 
-To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
-
-```bash
-$ crewai run
+```text
+CodeCrew/
+├─ src/
+│  └─ code_monkeys/
+│     ├─ config/         # YAML config for agents & tasks
+│     ├─ flows/          # EngineeringFlow orchestrator
+│     ├─ tools/          # (Empty) custom tools namespace
+│     └─ crew.py         # CrewBuilder & agents definition
+├─ output/               # Generated code & reports (git-ignored)
+├─ memory/               # Vector & LTM databases (git-ignored)
+├─ README.md             # <- you are here
+└─ pyproject.toml        # Package metadata & dependency pins
 ```
 
-This command initializes the code_monkeys Crew, assembling the agents and assigning them tasks as defined in your configuration.
+---
 
-This example, unmodified, will create a `report.md` file with the output of a research on LLMs in the root folder.
+## ⚙️ Configuration
+
+* **Agents:** customise roles & goals in `src/code_monkeys/config/agents.yaml`.  
+* **Tasks:** tweak or reorder steps in `src/code_monkeys/config/tasks.yaml`.  
+* **Flows:** extend `EngineeringFlow` (e.g., add Slack notifications) in `src/code_monkeys/flows/`.
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repo and create your feature branch (`git checkout -b feat/my-feature`).  
+2. Commit your changes with conventional commits.  
+3. Ensure `pytest` passes & `ruff` lints (`uv run lint`).  
+4. Open a PR — we ❤️ new contributors!
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.
 
 ## Understanding Your Crew
 
