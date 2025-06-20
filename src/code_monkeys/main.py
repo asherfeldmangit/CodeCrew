@@ -2,29 +2,70 @@
 import warnings
 import os
 from code_monkeys.crew import EngineeringTeam
+import subprocess
+import sys
+import ensurepip
 
 warnings.filterwarnings("ignore", category=SyntaxWarning, module="pysbd")
 
-os.makedirs('output', exist_ok=True)
+os.environ.setdefault("CHROMA_TELEMETRY_ENABLED", "false")
 
-requirements = """Create the game tic tac toe. The game should allow 1 user to play against the 'machine', OR two players to play eachother"""
-module_name = "TicTacToe"
-class_name = "T3Game"
+requirements = """Create a demo dating website for 'little' people. Brand it and be creative with the design"""
+
+project_name = "Dating_Website"
+class_name = "DatingWebsite"
+
+
+def _bootstrap_pip() -> None:
+    """Ensure `pip` is available in the current Python environment.
+
+    Some minimal venvs are created with --without-pip, which breaks the
+    agent-generated code that expects to install dependencies at runtime.
+    We attempt to restore pip using the standard library's *ensurepip*; if
+    that fails (very rare), we fall back to the get-pip.py bootstrap script.
+    """
+    try:
+        import pip  # type: ignore  # noqa: F401 – just a presence check
+        return  # pip already present
+    except ModuleNotFoundError:
+        pass  # proceed with bootstrap
+
+    try:
+        # Try the standard library helper first
+        ensurepip.bootstrap()
+    except Exception:  # pragma: no cover – ensurepip missing or failed
+        import urllib.request, tempfile, os
+        get_pip_url = "https://bootstrap.pypa.io/get-pip.py"
+        with urllib.request.urlopen(get_pip_url) as resp, tempfile.NamedTemporaryFile(delete=False, suffix="_getpip.py") as tmp:
+            tmp.write(resp.read())
+            tmp_path = tmp.name
+        subprocess.check_call([sys.executable, tmp_path])
+        os.unlink(tmp_path)
+
+    # Finally, upgrade pip to the latest stable version
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
 
 
 def run():
     """
-    Run the research crew.
+    Run the code monkeys crew.
     """
+    # Bootstrap packaging tools first (suggestion 5)
+    _bootstrap_pip()
+
+    # Ensure the per-project output directory exists (after project_name is set)
+    os.makedirs(f"output/{project_name}", exist_ok=True)
+
     inputs = {
         'requirements': requirements,
-        'module_name': module_name,
-        'class_name': class_name
+        'project_name': project_name,
+        'class_name': class_name,
+        'project_name_lower': project_name.lower(),
     }
 
     # Create and run the crew
     result = EngineeringTeam().crew().kickoff(inputs=inputs)
-
+    
 
 if __name__ == "__main__":
     run()
