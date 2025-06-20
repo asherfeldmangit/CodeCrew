@@ -66,23 +66,23 @@ Steps with the same background colour run in sequence, arrows denote dependencie
 ```mermaid
 graph TD
     subgraph Design
-        A["Design 📄\narchitect_agent"]
-        B["Task Breakdown 🗂\ntask_breaker"]
+        A["Design 📄<br/>architect_agent"]
+        B["Task Breakdown 🗂<br/>task_breaker"]
     end
     subgraph Backend
-        C["Backend Code 💾\nbackend_engineer"]
-        D["Code Review 🔍\narchitect_agent"]
-        E["Fix Comments 🛠\nbackend_engineer"]
-        F["Unit Tests ✅\ntest_engineer"]
+        C["Backend Code 💾<br/>backend_engineer"]
+        D["Code Review 🔍<br/>architect_agent"]
+        E["Fix Comments 🛠<br/>backend_engineer"]
+        F["Unit Tests ✅<br/>test_engineer"]
     end
     subgraph Frontend
-        G["Frontend UI 💻\nfrontend_engineer"]
-        H["UI Review 🔍\narchitect_agent"]
-        I["Fix Comments 🛠\nfrontend_engineer"]
-        J["Dependency Audit 📦\narchitect_agent"]
+        G["Frontend UI 💻<br/>frontend_engineer"]
+        H["UI Review 🔍<br/>architect_agent"]
+        I["Fix Comments 🛠<br/>frontend_engineer"]
+        J["Dependency Audit 📦<br/>architect_agent"]
     end
     subgraph QA
-        K["End-to-End Tests 🚦\ntest_engineer"]
+        K["End-to-End Tests 🚦<br/>test_engineer"]
     end
     A --> B --> C --> D --> E --> F
     F --> G --> H --> I --> J --> K
