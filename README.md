@@ -3,7 +3,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.10%20%E2%80%93%203.13-blue?logo=python" />
   <img src="https://img.shields.io/github/license/asherfeldmangit/CodeCrew" />
-  <img src="https://img.shields.io/github/actions/workflow/status/asherfeldmangit/CodeCrew/ci.yml?label=CI" />
 </p>
 
 > **Multi-agent software engineering on autopilot** — powered by [crewAI](https://crewai.com) & OpenAI.
