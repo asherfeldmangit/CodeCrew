@@ -55,21 +55,17 @@ class EngineeringFlow(Flow[EngineeringState]):
     # ---------------------------------------------------------------------
 
     @start()
-    def collect_inputs(
-        self,
-        requirements: str,
-        project_name: str | None = None,
-        class_name: str | None = None,
-    ):  # noqa: D401
-        """Populate initial state from kickoff() arguments."""
+    def collect_inputs(self):  # noqa: D401
+        """Initial step – state is already pre-populated by Flow.kickoff().
 
-        self.state.requirements = requirements
-        self.state.project_name = project_name or ""
-        self.state.class_name = class_name or ""
+        We only create the output directory if *project_name* was provided by the
+        caller (advanced use-case). Otherwise the *propose_names* step will
+        generate it.
+        """
 
-        # If name already provided create output dir now; otherwise propose_names step will do it.
         if self.state.project_name:
             os.makedirs(f"output/{self.state.project_name}", exist_ok=True)
+
         return "inputs_collected"
 
     # ---------------------------------------------------------------------
