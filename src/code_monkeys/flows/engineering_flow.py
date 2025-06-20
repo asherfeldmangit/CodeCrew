@@ -100,13 +100,26 @@ class EngineeringFlow(Flow[EngineeringState]):
         try:
             response = architect.chat(prompt)  # type: ignore[attr-defined]
             data = json.loads(response)
-            self.state.project_name = str(data["project_name"]).strip()
-            self.state.class_name = str(data["class_name"]).strip()
+            raw_project = str(data["project_name"]).strip()
+            raw_class = str(data["class_name"]).strip()
         except Exception:  # pragma: no cover – robust fallback
             # Fallback: derive names from requirements heuristic.
             slug = re.sub(r"[^A-Za-z]+", " ", self.state.requirements).title().replace(" ", "")
-            self.state.project_name = slug if slug else "GeneratedProject"
-            self.state.class_name = self.state.project_name
+            raw_project = slug if slug else "GeneratedProject"
+            raw_class = raw_project
+
+        # -----------------------------------------------------------------
+        # Post-process & constrain names for safety
+        # -----------------------------------------------------------------
+
+        def _sanitize(name: str) -> str:
+            name = re.sub(r"[^A-Za-z0-9]", "", name)
+            if not name:
+                name = "GeneratedName"
+            return name[:50]  # macOS/file-system safe length
+
+        self.state.project_name = _sanitize(raw_project)
+        self.state.class_name = _sanitize(raw_class)
 
         # Ensure an output directory now that we have the project name
         os.makedirs(f"output/{self.state.project_name}", exist_ok=True)
