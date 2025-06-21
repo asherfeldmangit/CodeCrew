@@ -1,2 +1,3 @@
-Hangman
-Create a Hangman game with a large bank of words and a simple, pretty interactive UI.
+xDating
+
+Create a simple and elegant dating app for little people. Think of a creative name for the app. Brand it accordingly.

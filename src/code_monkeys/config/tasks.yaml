@@ -51,7 +51,6 @@ backend_code_review_task:
   expected_output: >
     - Markdown review listing only high-/critical issues.
   agent: architect_agent
-  # Include timestamp to avoid overwriting previous reviews
   output_file: output/{project_name}/{project_name}_code_review_{timestamp}.md
   context:
     - backend_code_task
@@ -163,7 +162,8 @@ materialise_code_task:
   context:
     - backend_code_task
     - frontend_task
-  output_file: none
+  # Save a summary of materialisation under the project output directory
+  output_file: output/{project_name}/{project_name}_materialisation_{timestamp}.md
 
 # ---- NEW TASK: readme_task ----
 readme_task:
