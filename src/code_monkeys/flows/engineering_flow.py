@@ -11,6 +11,7 @@ from typing import Dict, Any
 import os
 import json
 import re
+from datetime import datetime
 
 from pydantic import BaseModel, Field
 from crewai.flow.flow import Flow, listen, start
@@ -145,6 +146,8 @@ class EngineeringFlow(Flow[EngineeringState]):
             "project_name": self.state.project_name,
             "class_name": self.state.class_name,
             "project_name_lower": self.state.project_name.lower(),
+            # Unique identifier to prevent output files from being overwritten
+            "timestamp": datetime.utcnow().strftime("%Y%m%d_%H%M%S"),
         }
 
         # The crew returns a Result object with a `.raw` attribute (by default)

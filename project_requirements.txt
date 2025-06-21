@@ -1,1 +1,2 @@
-[Add a block of text describing the project]
+Hangman
+Create a Hangman game with a large bank of words and a simple, pretty interactive UI.

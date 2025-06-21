@@ -135,7 +135,7 @@ class EngineeringTeam():
             code_execution_mode="safe",
             max_execution_time=1500,
             max_retry_limit=5,
-            memory=True
+            memory=False  # Utility agent performs mechanical tasks; no context needed.
         )
 
     @crew

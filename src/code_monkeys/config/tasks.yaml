@@ -27,27 +27,15 @@ breaking_task:
 backend_code_task:
   name: "Backend Code Task"
   description: >
-    Implement the task / fix the comments exactly as provided.
-    
-    🚨 Packaging rule (must follow) 🚨
-    ---------------------------------
-    • All source files must live inside a dedicated **package folder named `{project_name_lower}`** (lower-case project name).  
-    • Internal imports must be package-relative, e.g. `from {project_name_lower}.board import Board` — **never** `from board import Board`.  
-    • Do **not** add that folder to `sys.path`; proper packaging makes this unnecessary.
-    
-    Guidelines:
-      - Replicate the file & class names from the design.  
-      - Include type hints, docstrings, and minimal inline comments.  
-      - Follow PEP 8.  
-      - Keep external deps minimal and list them in requirements.txt if used.  
-      - If any third-party libraries are used (e.g., streamlit), also output a REQUIREMENTS.TXT file in the same folder listing them.  
-      - Before executing any code, run `pip install -r requirements.txt` (or install the listed packages) within the Code Interpreter.
+    Implement the assigned backend task.
+    • Package folder: `{project_name_lower}` (lower-case project name).
+    • Use package-relative imports only.
+    • Guidelines: match design names, add type hints & docstrings, follow PEP 8, keep deps minimal (list in requirements.txt).
+    • Run `pip install -r requirements.txt` before executing.
     Here are the requirements: {requirements}
   expected_output: >
-    MANDATORY: A python project that implements the design and achieves the requirements.
-    Include a requirements.txt file listing all third-party dependencies (leave empty if none).
-    IMPORTANT: Output ONLY raw Python project code without any markdown formatting, code block delimiters, or backticks.
-    The output should be valid Python code directly saved to files which can be executed.
+    - Raw Python project implementing the design (no markdown / code fences).
+    - requirements.txt (empty if no deps).
   agent: backend_engineer
   context:
     - design_task
@@ -57,20 +45,14 @@ backend_code_task:
 backend_code_review_task:
   name: "Backend Code Review Task"
   description: >
-    Perform an in-depth review of backend_code_task and provide feedback on the code.
-    When reviewing focus on how well the task accomplishes the goal set out in the design document.
-    The code should also be reviewed for the following:
-      - PEP 8 compliance
-      - Type hints
-      - Docstrings
-      - Comments
-      - Code readability
-    Comments should be submitted with filename and line number, and a concise comment of why this needs to be fixed. 
-    If there is a clear-cut solution, include a code fix.
+    Review backend code against design.
+    Code must conform to python coding Principle of least astonishment.
+    Flag PEP 8, type-hint, docstring & readability issues (filename:line + comment; add fix if trivial).
   expected_output: >
-    MANDATORY: A detailed markdown code review with comments on the code. Include only high or critical comments.
+    - Markdown review listing only high-/critical issues.
   agent: architect_agent
-  output_file: output/{project_name}/{project_name}_code_review.md
+  # Include timestamp to avoid overwriting previous reviews
+  output_file: output/{project_name}/{project_name}_code_review_{timestamp}.md
   context:
     - backend_code_task
     - design_task
@@ -82,7 +64,8 @@ fix_backend_comments_task:
   expected_output: >
     MANDATORY: A detailed markdown code review with comments on the code.
   agent: backend_engineer
-  output_file: output/{project_name}/{project_name}_code_review.md
+  # Save fixed-review to a separate file per run
+  output_file: output/{project_name}/{project_name}_code_review_fix_{timestamp}.md
   context:
     - backend_code_task
     - backend_code_review_task
@@ -90,35 +73,30 @@ fix_backend_comments_task:
 frontend_task:
   name: "Frontend Task"
   description: >
-    Create `app.py` alongside the backend package folder ({project_name_lower}) that demonstrates the backend.
-    Import the backend with `from {project_name_lower} import …`.
-    Keep the UI minimal yet functional.
-    Remember to install any dependencies via requirements.txt before running the UI code.
+    Create a ReactJS SPA inside folder `frontend/` that demonstrates the backend.
+    • Provide `package.json` with scripts: `npm install`, `npm start`.
+    • UI must be responsive, modern and interactive but light.
+    • Integrate with backend as described in the design (direct import or HTTP calls).
     Here are the requirements: {requirements}
   expected_output: >
-    MANDATORY: A UI executed from /{project_name}/app.py that demonstrates the backend code using the chosen UI technology.
-    The file should be ready so that it can be run as-is, in the same directory as the backend project, 
-    and it should import the backend code from {project_name}.
-    If the UI relies on third-party libraries, also output requirements.txt listing them.
-    IMPORTANT: Output ONLY raw Python code without any markdown formatting, code block delimiters, or backticks.
-    The output should be valid Python code that can be directly saved to a file and executed.
+    - Raw source files for a ReactJS project under `frontend/` (index.html, src/, package.json, etc.).
+    - Do NOT include markdown or code fences.
   agent: frontend_engineer
   context:
     - backend_code_task
-  output_file: output/{project_name}/{project_name}_app.py
+  output_file: output/{project_name}/frontend_source.txt
 
 # ---- NEW TASK: dependency_audit_task ----
 dependency_audit_task:
   name: "Dependency Audit Task"
   description: >
-    For every requirements.txt produced so far, verify via web-search:
-      • that each package exists on PyPI
-      • latest stable version
-      • whether it is abandoned or has critical security issues
-    Produce a clean requirements.txt with pinned versions (no pre-releases).  
-    Raise blocking comments for any package that fails the check.
+    Audit each requirements.txt:
+      • Validate package on PyPI
+      • Pin to latest stable
+      • Flag abandoned / vulnerable packages
+    Output cleaned, pinned requirements.txt plus report.
   expected_output: >
-    MANDATORY: A markdown report summarising the audit and an updated requirements.txt (if changes were needed).
+    - Markdown audit summary + updated requirements.txt
   agent: architect_agent
   context:
     - backend_code_task
@@ -128,20 +106,12 @@ dependency_audit_task:
 frontend_code_review_task:
   name: "Frontend Code Review Task"
   description: >
-    Perform an in-depth review of frontend_task and provide feedback on the code.
-    When reviewing focus on how well the task accomplishes the goal set out in the design document and backend integration.
-    The code should also be reviewed for the following:
-      - PEP 8 compliance
-      - Type hints (where relevant)
-      - Docstrings
-      - Comments
-      - Code readability
-    Comments should be submitted with filename and line number, and a concise comment of why this needs to be fixed.
-    If there is a clear-cut solution, include a code fix.
+    Review ReactJS frontend: verify design alignment & backend integration; flag accessibility, code organisation, component reuse, styling consistency and performance issues.
   expected_output: >
-    MANDATORY: A detailed markdown code review with comments on the UI code. Include only high or critical comments.
+    - Markdown review listing only high-/critical frontend issues.
   agent: architect_agent
-  output_file: output/{project_name}/{project_name}_frontend_code_review.md
+  # Timestamped file to preserve each review
+  output_file: output/{project_name}/{project_name}_frontend_code_review_{timestamp}.md
   context:
     - frontend_task
     - design_task
@@ -154,20 +124,17 @@ fix_frontend_comments_task:
   expected_output: >
     MANDATORY: Updated UI code reflecting the feedback provided.
   agent: frontend_engineer
-  output_file: output/{project_name}/{project_name}_app.py
+  output_file: output/{project_name}/frontend_source.txt
   context:
     - frontend_task
     - frontend_code_review_task
 
 test_task:
   name: "Test Task"
-  description: |
-    Write pytest-style unit tests for project {project_name} in module test_{project_name} inside the same folder. 
-    Cover happy paths, edge cases, and failure modes. Ensure tests are deterministic and run in <1 s.
+  description: >
+    Write pytest tests in `test_{project_name}.py` covering happy, edge & failure cases (<1 s runtime).
   expected_output: >
-    MANDATORY: A test_{project_name} module that tests the given project.
-    IMPORTANT: Output ONLY raw Python code without any markdown formatting, code block delimiters, or backticks.
-    The output should be valid Python code that can be directly saved to a file and executed.
+    - Raw Python test module `test_{project_name}.py` (no markdown).
   agent: test_engineer
   context:
     - fix_backend_comments_task
@@ -189,10 +156,9 @@ end_to_end_test_task:
 materialise_code_task:
   name: "Materialise Code"
   description: >
-    Convert the monolithic *_{project_name}.txt* artefact produced by backend_code_task into actual Python files under output/{project_name}/.
-    Fail the task if any declared file listed in the txt is missing after extraction.
+    Split *_{project_name}.txt* into real source files under output/{project_name}/. Fail if any listed file is missing.
   expected_output: >
-    MANDATORY: Real source files written to disk inside output/{project_name}/ matching the file headers in the txt artefact.
+    - Source files materialised under output/{project_name}/.
   agent: utility_agent
   context:
     - backend_code_task
@@ -203,16 +169,15 @@ materialise_code_task:
 readme_task:
   name: "Generate README Task"
   description: >
-    Create a concise README.md for the generated project.
-    The README **must** include:
-      • Project title and one-sentence description.
-      • Supported Python version (match the version constraint from pyproject.toml).
-      • Setup instructions (create a virtual environment, `pip install -r requirements.txt`).
-      • Launch instructions for both backend and UI (e.g. `python app.py`, `streamlit run app.py`).
-      • How to execute the automated tests (`pytest`).
-    Keep the instructions copy-paste friendly and minimal.
+    Write minimal README.md with:
+      • Title + 1-line description
+      • Python version
+      • Backend setup: venv + `pip install -r requirements.txt`
+      • Frontend setup: `npm install` then `npm start` inside `frontend/`
+      • Combined helper command: `./run.sh ui` or `./run.sh cli`
+      • Run tests (`pytest`)
   expected_output: >
-    MANDATORY: A markdown README saved to output/{project_name}/README.md containing the sections above.
+    - README.md saved to output/{project_name}/
   agent: architect_agent
   # Run after code & UI are finalised and dependencies audited
   context:
