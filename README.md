@@ -93,6 +93,22 @@ graph TD
 
 Each **code→review→fix** trio can iterate up to *three* rounds if blockers remain.
 
+### 📜 Step-by-Step Crew Flow
+
+1. **Collect Inputs** – `EngineeringFlow` ingests your product requirements from `project_requirements.txt` (or arguments passed to `kickoff()`).
+2. **Propose Names** – The *architect_agent* suggests a Python-friendly `project_name` and root `class_name`, and the output directory `output/<PROJECT>/` is created.
+3. **Design Document** – The *architect_agent* writes a detailed markdown spec covering modules, classes, and responsibilities.
+4. **Task Breakdown** – The *task_breaker* decomposes the spec into atomic, testable engineering tasks.
+5. **Backend Implementation** – The *backend_engineer* builds the core Python package following the design.
+6. **Backend Review & Fixes** – The *architect_agent* reviews the code; the *backend_engineer* addresses any blocking comments.
+7. **Unit Tests** – The *test_engineer* authors pytest-style unit tests to validate the backend.
+8. **Frontend Implementation** – The *frontend_engineer* crafts a minimal UI (`app.py`) showcasing the backend functionality.
+9. **Frontend Review & Fixes** – The *architect_agent* reviews the UI; the *frontend_engineer* refines it.
+10. **Dependency Audit** – The *architect_agent* audits all `requirements.txt` files, pinning safe, stable package versions.
+11. **End-to-End Tests** – The *test_engineer* conducts full-stack testing and reports any bugs.
+12. **Materialise Code** – The *utility_agent* extracts the monolithic backend artefact into real source files on disk.
+13. **Project README** – Finally, the *architect_agent* auto-generates a ready-to-ship README for the generated project.
+
 ---
 
 ## 🗂 Project Structure
