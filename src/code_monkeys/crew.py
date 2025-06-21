@@ -122,6 +122,10 @@ class EngineeringTeam():
     def materialise_code_task(self) -> Task:
         return Task(config=self.tasks_config['materialise_code_task'])
 
+    @task
+    def readme_task(self) -> Task:
+        return Task(config=self.tasks_config['readme_task'])
+
     @agent
     def utility_agent(self) -> Agent:
         return Agent(
@@ -129,7 +133,7 @@ class EngineeringTeam():
             verbose=True,
             allow_code_execution=True,
             code_execution_mode="safe",
-            max_execution_time=300,
+            max_execution_time=1500,
             max_retry_limit=5,
             memory=True
         )

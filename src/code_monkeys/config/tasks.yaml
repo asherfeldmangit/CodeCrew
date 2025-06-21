@@ -198,4 +198,26 @@ materialise_code_task:
     - backend_code_task
     - frontend_task
   output_file: none
+
+# ---- NEW TASK: readme_task ----
+readme_task:
+  name: "Generate README Task"
+  description: >
+    Create a concise README.md for the generated project.
+    The README **must** include:
+      • Project title and one-sentence description.
+      • Supported Python version (match the version constraint from pyproject.toml).
+      • Setup instructions (create a virtual environment, `pip install -r requirements.txt`).
+      • Launch instructions for both backend and UI (e.g. `python app.py`, `streamlit run app.py`).
+      • How to execute the automated tests (`pytest`).
+    Keep the instructions copy-paste friendly and minimal.
+  expected_output: >
+    MANDATORY: A markdown README saved to output/{project_name}/README.md containing the sections above.
+  agent: architect_agent
+  # Run after code & UI are finalised and dependencies audited
+  context:
+    - fix_frontend_comments_task
+    - dependency_audit_task
+    - materialise_code_task
+  output_file: output/{project_name}/README.md
   
